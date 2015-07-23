@@ -1,29 +1,88 @@
 <div class="col-sm-8">
-  <table class="table table-striped">
-    <tbody>
+        <!-- START OF PANEL -->
       <% @posts.each do |post| %>
-        <tr>
-          <td>
-            <%= bootstrap_form_for [post,Vote.new] do |f| %>
-              <%= f.button "", value: 'up', class: 'btn btn-primary btn-xs glyphicon glyphicon-chevron-up' %><br>
-              <%= f.button "", value: 'down', class: 'btn btn-primary btn-xs glyphicon glyphicon-chevron-down' %>
-            <% end %>
-          </td>
-          <td><%= post.votes.reduce(0){ |sum,v| sum + v.value} %></td>
-          <td>
-            <a href="<%= post.link %>"><%= post.title %></a>
-          </td>
-          <td><%= post.user.display_name %></td>
-          <td><%= format_creation_time post %></td>
-          <td>0 Comments</td>
-          <td>
-          <!--% if @current_user && @current_user.id == post.user.id %-->
-          <% if post.owned_by? @current_user %>
-            <%= link_to "", edit_post_path(post), class: 'glyphicon glyphicon-pencil' %>
-            <%= link_to "", post, method:'delete', class: 'glyphicon glyphicon-trash' %>
-          <% end %>
-          </td>
-        </tr>
+          <div class="panel panel-default">
+            <div class="panel-heading row">
+              <div class="col-xs-1">
+                <%= bootstrap_form_for [post,Vote.new] do |f| %>
+                  <%= f.button "", value: 'up', class: 'btn btn-primary btn-xs glyphicon glyphicon-chevron-up' %><br>
+                  <%= f.button "", value: 'down', class: 'btn btn-primary btn-xs glyphicon glyphicon-chevron-down' %>
+                <% end %>
+              </div>
+              <div class="col-xs-1">
+                <%= post.votes.reduce(0){ |sum,v| sum + v.value} %>
+              </div>
+              <div class="col-xs-5">
+                <a href="<%= post.link %>"><%= post.title %></a>
+              </div>
+              <div class="col-xs-2">
+                <%= post.user.display_name %>
+              </div>
+              <div class="col-xs-2">
+                <%= format_creation_time post %>
+              </div>
+              <div class="col-xs-1">
+               <!--% if @current_user && @current_user.id == post.user.id %-->
+                <% if post.owned_by? @current_user %>
+                  <%= link_to "", edit_post_path(post), class: 'glyphicon glyphicon-pencil' %>
+                  <%= link_to "", post, method:'delete', class: 'glyphicon glyphicon-trash' %>
+                <% end %>
+              </div>
+            </div>
+
+            <!-- start of accordion comments -->
+
+            <div class="panel-body">
+
+              <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                  <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingOne">
+                      <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href=<%= "#collapse" + post.id.to_s %> aria-expanded="false" aria-controls=<%= "collapse" + post.id.to_s %> >
+                          <% if post.comments.length != 0 %>
+                             <%= post.comments.length.to_s + " Comments" %>
+                          <% else %>
+                             <%= "Be the 1st to comment" %>
+                          <% end %>
+                        </a>
+                      </h4>
+                    </div>
+
+                    <div id=<%= "collapse" + post.id.to_s %> class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                      <!-- Start of Table in panel body -->
+                      <div class="panel-body">
+                        <table class="table table-striped">
+                          <tbody>
+                            <% post.comments.each do |comment| %>
+                              <tr>
+                                <td><%= format_creation_time(comment) %></td>
+                                <td><em>- <%= comment.user.name %></em></td>
+                                <td><%= comment.description %></td>
+                              </tr>
+                            <% end %>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+              <form class="form-inline" action="" method="POST" role="form">
+                 <div class="form-group form-group-small">
+                  <label class="sr-only col-xs-1" for="">Enter Comment</label>
+                  <div class="col-xs-10">
+                    <input type="text" class="form-control" id="new" placeholder="Make a Comment">
+                  </div>
+                  <div class="col-xs-1">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <!-- END OF PANEL -->
+        <!-- end of accordion comments -->
       <% end %>
     </tbody>
   </table>

@@ -11,12 +11,12 @@ class User < ActiveRecord::Base
 
   #posts I created
   has_many :posts
-
   #votes I created
   has_many :ratings, class_name: 'Vote'
-
   #votes about me
   has_many :votes, as: :votable
+
+  has_many :comments
 
   def display_name
     self.name || 'Anon'
